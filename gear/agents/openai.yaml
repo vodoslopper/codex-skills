@@ -1,0 +1,4 @@
+interface:
+  display_name: "ALT Gear Builder"
+  short_description: "Build ALT Linux packages with Gear and Hasher"
+  default_prompt: "Use $gear to build and troubleshoot this ALT Linux package with Gear and Hasher."

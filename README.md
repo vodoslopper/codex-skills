@@ -13,3 +13,7 @@ The `gear` skill helps Codex build and troubleshoot ALT Linux RPM packages with 
 These skills are **very experimental**. Their instructions, structure, and behavior may change without notice. They may be incomplete, make incorrect assumptions, or behave differently across Codex versions and environments.
 
 Review every proposed command and change before using these skills on important repositories or systems. Do not rely on them for production workflows without independent testing and validation.
+
+## License
+
+This repository is licensed under the MIT License. See [`LICENSE`](LICENSE).

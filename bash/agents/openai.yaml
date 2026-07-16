@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bash"
+  short_description: "Write portable, strict POSIX shell scripts"
+  default_prompt: "Use $bash to write or revise this shell script using strict, portable POSIX syntax."

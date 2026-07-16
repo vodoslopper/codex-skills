@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lineup"
+  short_description: "Create and maintain Lineup TOML manifests"
+  default_prompt: "Use $lineup to create or update a Lineup LM.toml manifest."

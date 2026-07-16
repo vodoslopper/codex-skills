@@ -1,0 +1,4 @@
+interface:
+  display_name: "VML"
+  short_description: "Run and manage local virtual machines"
+  default_prompt: "Use $vml to run a virtual machine for this task."

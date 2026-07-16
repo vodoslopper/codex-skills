@@ -10,8 +10,27 @@ description: Build, rebuild, and troubleshoot ALT Linux RPM packages from Gear G
 1. Work from the package's Gear Git repository root.
 2. Inspect `git status`, the spec file, `.gear/rules`, and relevant sources and patches.
 3. Preserve unrelated user changes and follow the repository's existing packaging layout.
-4. Verify that `gear`, `hsh-rebuild`, and Git are available. Do not silently install packages, initialize Hasher, or change system configuration.
-5. Confirm that a reusable Hasher environment already exists. `hsh-rebuild` reuses that environment; if it is absent, explain that an initial Hasher build must create it.
+4. Verify that `gear`, `hsh`, `hsh-rebuild`, and Git are available. Do not silently install packages or change system configuration. Initialize Hasher only under the conditions below.
+5. Check whether a reusable Hasher chroot already exists and identify the branch and architecture it was initialized for. `hsh-rebuild` reuses that environment.
+
+## Create the Hasher chroot when required
+
+Create a Hasher chroot only when at least one of these conditions applies:
+
+- no reusable chroot exists;
+- the requested branch differs from the existing chroot's branch;
+- the requested architecture differs from the existing chroot's architecture;
+- the user explicitly requests a new, recreated, or cleared chroot.
+
+Do not initialize or recreate the chroot for a normal rebuild when the existing branch and architecture already match.
+
+Initialize it with `hsh --initroot-only`. For a specific branch or architecture, select an existing matching `~/apt/apt.conf.<branch>.<arch>` and pass it to this initialization command. For example, to initialize a P11 AArch64 chroot:
+
+```bash
+hsh --initroot-only --apt-config="$HOME/apt/apt.conf.p11.aarch64" --target=aarch64
+```
+
+If a custom Hasher workdir is in use, pass the same workdir to this command. Verify that the APT configuration exists before initialization and do not edit it. Do not pass `--apt-config` to the subsequent `hsh-rebuild`; the initialized chroot is reused for the build.
 
 ## Build and capture the log
 
@@ -52,7 +71,7 @@ Do not hide undeclared dependencies by installing them only into the retained ch
 
 1. Confirm the left side of the pipeline exited successfully.
 2. Locate the source RPM in the configured Hasher repository's `SRPMS.hasher` and binary RPMs in its architecture-specific `RPMS.hasher` directory. Respect custom Hasher paths.
-3. Report the exact command, artifact filenames, architecture, and `log` location.
+3. Report the exact command, branch, architecture, artifact filenames, and `log` location. If the chroot was initialized, also report the initialization command and selected APT configuration.
 4. Summarize packaging changes and explicitly state that the packager and GPG Sisyphus checks were disabled.
 5. If the current host cannot run ALT Gear/Hasher, provide the command for an ALT Linux host and label the build unverified.
 

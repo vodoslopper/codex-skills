@@ -25,7 +25,7 @@ VML uses `vml [global-options] <subcommand> [subcommand-options] [name]`. Put gl
 
 - Single VM: `vml <start|stop|show|remove|ssh|monitor> [options] <name>`.
 - Multiple VMs: use the subcommand's `--names <name>...`, `--parents <parent>...`, or `--tags <tag>...` selector; use global `--all-vms` only when explicitly intended.
-- Create and run: `vml run [options] <name>`; create without starting: `vml create [options] <name>`.
+- Create and run: `vml run [options] <name>`; create without starting: `vml create [options] <name>`. Omit `--image` unless a specific image is required; VML uses the configured default image.
 - Guest command: `vml ssh [--check] --cmd '<command>' <name>`. Without `--cmd`, SSH is interactive.
 - Copy to a guest: `vml rsync-to --sources <source>... [--destination <destination>] <name>`; use `--template <template>` instead of `--sources` for a templated source.
 - Copy from a guest: `vml rsync-from --sources <source>... [--destination <destination>] <name>`.
@@ -36,12 +36,12 @@ Options generally precede the positional VM name. Preserve shell quoting around 
 
 ## Run VMs
 
-- Use `vml run <name>` as the create-and-start shortcut.
+- Use `vml run <name>` as the create-and-start shortcut; when no particular image is required, omit `--image` so VML uses the default from its configuration.
 - Use `vml run --name-same-image <name>` when the VM and image intentionally have the same name.
 - Add only requested or necessary options such as `--image`, `--memory`, `--nproc`, networking, display, cloud-init, or SSH behavior.
 - Prefer `--exists-ignore` and `--running-ignore` when an idempotent operation is appropriate.
 - Use `--snapshot` when the user wants changes discarded after the run.
-- Do not guess an image. Inspect `vml image list`, `vml image available`, and the configured `images.default`; ask the user if the choice materially affects the result and cannot be inferred.
+- When a specific image is required, inspect `vml image list`, `vml image available`, and the configured `images.default`; ask the user if the choice materially affects the result and cannot be inferred.
 - Use `--wait-ssh` when subsequent work requires the guest to be reachable. Use `--ssh` only when an interactive session is desired.
 
 ## Manage VMs
@@ -85,7 +85,7 @@ Register an image with `vml image add --name <name> --url <direct-qcow2-url> --d
 ```sh
 vml list
 vml image list
-vml run test-vm --image alt-sisyphus --memory 2G --nproc 2 --no-ssh
+vml run test-vm --memory 2G --nproc 2 --no-ssh
 vml show test-vm
 vml ssh test-vm --check --cmd 'uname -a'
 vml stop test-vm

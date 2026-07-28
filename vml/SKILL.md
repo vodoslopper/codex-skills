@@ -23,13 +23,13 @@ Use `vml <subcommand> --help` only when the invocation is complex, its syntax is
 
 VML uses `vml [global-options] <subcommand> [subcommand-options] [name]`. Put global options such as `--host`, `--all-vms`, `--vm-config`, and `--minimal-vm-config` before the subcommand. Put subcommand options after it.
 
-- Single VM: `vml <start|stop|show|remove|ssh|monitor> [options] <name>`.
-- Multiple VMs: use the subcommand's `--names <name>...`, `--parents <parent>...`, or `--tags <tag>...` selector; use global `--all-vms` only when explicitly intended.
-- Create and run: `vml run [options] <name>`; create without starting: `vml create [options] <name>`. Omit `--image` unless a specific image is required; VML uses the configured default image.
-- Guest command: `vml ssh [--check] --cmd '<command>' <name>`. Without `--cmd`, SSH is interactive.
-- Copy to a guest: `vml rsync-to --sources <source>... [--destination <destination>] <name>`; use `--template <template>` instead of `--sources` for a templated source.
-- Copy from a guest: `vml rsync-from --sources <source>... [--destination <destination>] <name>`.
-- QEMU monitor: `vml monitor --command '<command>' <name>`.
+- Single VM: `vml <start|stop|show|remove|ssh|monitor> [options] -n <name>`; `--names <name>` is equivalent.
+- Multiple VMs: use the subcommand's `-n/--names <name>...`, `--parents <parent>...`, or `--tags <tag>...` selector; use global `--all-vms` only when explicitly intended.
+- Create and run: `vml run [options] -n <name>`; create without starting: `vml create [options] -n <name>`. Omit `--image` unless a specific image is required; VML uses the configured default image.
+- Guest command: `vml ssh [--check] --cmd '<command>' -n <name>`. Without `--cmd`, SSH is interactive.
+- Copy to a guest: `vml rsync-to --sources <source>... [--destination <destination>] -n <name>`; use `--template <template>` instead of `--sources` for a templated source.
+- Copy from a guest: `vml rsync-from --sources <source>... [--destination <destination>] -n <name>`.
+- QEMU monitor: `vml monitor --command '<command>' -n <name>`.
 - Images: `vml image <list|available|add|pull|store|remove> [options]`; names and action-specific arguments follow that action's options.
 
 Options generally precede the positional VM name. Preserve shell quoting around guest commands, paths with spaces, and descriptions.
@@ -85,10 +85,10 @@ Register an image with `vml image add --name <name> --url <direct-qcow2-url> --d
 ```sh
 vml list
 vml image list
-vml run test-vm --memory 2G --nproc 2 --no-ssh
-vml show test-vm
-vml ssh test-vm --check --cmd 'uname -a'
-vml stop test-vm
+vml run -n test-vm --memory 2G --nproc 2 --no-ssh
+vml show -n test-vm
+vml ssh -n test-vm --check --cmd 'uname -a'
+vml stop -n test-vm
 ```
 
 Adapt examples to the installed CLI and actual image names; never copy placeholder names blindly.

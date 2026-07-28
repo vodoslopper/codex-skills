@@ -14,7 +14,7 @@ Use the upstream repository at <https://github.com/Obirvalger/vml> as the author
 
 ## VM selectors
 
-- Use `--names` (`-n`) for complete VM names. Omit it only for a single positional name.
+- Use `-n` or `--names` for complete VM names, including a single VM. Keep `--names` when a command or script already uses it; the two forms are equivalent.
 - Use `--parents` (`-p`) to select all VMs below a path-like parent. Names such as `group/first` express hierarchy.
 - Use `--tags` (`-t`) to select tags declared in VM configuration.
 - Use list folding only for display; do not confuse a folded parent with a single VM.
@@ -23,9 +23,6 @@ Use the upstream repository at <https://github.com/Obirvalger/vml> as the author
 
 - Expect VML to use cloud-init's NoCloud data source through an additional metadata drive.
 - Use cloud-init-capable QCOW2 cloud images as VM base images. A filename containing `cloud`, `genericcloud`, or `cloudimg` is a useful discovery signal, not proof of compatibility; verify the variant in the publisher's documentation.
-- Allow VML to generate metadata when cloud-init is enabled, or pass a prepared seed image through `cloud-init-image` / `--cloud-init-image`.
-- Create a custom seed image with `cloud-localds <seed.img> <user-data.yaml>` when requested.
-- Never retain placeholder public keys in user-data. Verify the requested user's SSH key and avoid printing private keys.
 
 ## Networking
 

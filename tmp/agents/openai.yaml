@@ -1,4 +1,4 @@
 interface:
   display_name: "Use $TMP/codex"
-  short_description: "Keep temporary content under $TMP/codex"
-  default_prompt: "Use $tmp to keep all temporary files and directories under $TMP/codex."
+  short_description: "Keep Codex temporary content under $TMP/codex"
+  default_prompt: "Use $tmp to keep Codex's own temporary operational artifacts under $TMP/codex without imposing that path on files created for the user."

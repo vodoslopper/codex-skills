@@ -5,6 +5,10 @@ description: Build, rebuild, and troubleshoot ALT Linux RPM packages from Gear G
 
 # Build ALT Linux Packages with Gear and Hasher
 
+Always build ALT packages in a Hasher environment. Never build them directly on
+the local host or use a local RPM build as a fallback, substitute, or
+verification for a Hasher build.
+
 ## Inspect before building
 
 1. Work from the package's Gear Git repository root.
@@ -34,7 +38,8 @@ If a custom Hasher workdir is in use, pass the same workdir to this command. Ver
 
 ## Build and capture the log
 
-Run the user-defined build pipeline from the repository root:
+Run the user-defined Hasher build pipeline from the repository root. Do not
+replace it with a local `rpmbuild`, `gear --rpmbuild`, or other host build:
 
 ```bash
 bash -o pipefail -c 'gear --commit --hasher -- hsh-rebuild --no-sisyphus-check=packager,gpg 2>&1 | tee log'

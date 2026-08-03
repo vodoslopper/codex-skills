@@ -15,7 +15,7 @@ Read [references/project.md](references/project.md) when configuring VML, select
 2. Inspect relevant state with `vml list`, `vml show`, or `vml image list`.
 3. Write ordinary commands directly from the syntax below. Do not routinely probe commands with `--help` first.
 4. Select the smallest command that satisfies the request.
-5. Run it and verify the result with `vml show <name>`, `vml list`, or the command's exit status and output.
+5. Run it and verify the result with the command's exit status and output, using `vml show <name>` or `vml list` only when the command does not already confirm the required state. In particular, start a VM with explicit `--wait-ssh` and do not check it again after that command returns successfully.
 
 Use `vml <subcommand> --help` only when the invocation is complex, its syntax is not covered here, an installed-version difference matters, or a command fails with a usage/option error. For nested image commands, use `vml image <action> --help`. After an error, inspect the narrowest relevant help and retry with the corrected command.
 
@@ -42,12 +42,13 @@ Options generally precede the positional VM name. Preserve shell quoting around 
 - Prefer `--exists-ignore` and `--running-ignore` when an idempotent operation is appropriate.
 - Use `--snapshot` when the user wants changes discarded after the run.
 - When a specific image is required, inspect `vml image list`, `vml image available`, and the configured `images.default`; ask the user if the choice materially affects the result and cannot be inferred.
-- Use `--wait-ssh` when subsequent work requires the guest to be reachable. Use `--ssh` only when an interactive session is desired.
+- VM startup can take time. Although `vml start` waits for SSH by default, pass `--wait-ssh` explicitly so configuration cannot override it. Let the command finish and, after a successful return, proceed without a separate readiness or state check.
+- Use `--wait-ssh` for commands where it is not already the default and subsequent work requires the guest to be reachable. Use `--ssh` only when an interactive session is desired.
 
 ## Manage VMs
 
 - Inspect: `vml list`, `vml show <name>`, or `vml show --format-json <name>`.
-- Start an existing VM: `vml start <name>`.
+- Start an existing VM: `vml start --wait-ssh <name>`. Pass `--wait-ssh` explicitly even though it is the default because configuration can override the default. A successful return confirms that the guest is reachable; do not follow it with `vml show`, `vml list`, or another SSH readiness probe.
 - Stop a VM gracefully: `vml stop <name>`. Use `--force` only when necessary or explicitly requested.
 - Run commands inside a VM: `vml ssh <name> --cmd <command>`. Add `--check` when command failure must fail the operation.
 - Open an interactive session: `vml ssh <name>`.

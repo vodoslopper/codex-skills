@@ -1,6 +1,6 @@
 ---
 name: tmp
-description: Keep temporary files, directories, sockets, caches, logs, and intermediate artifacts created by Codex while performing a task under `$TMP/codex`. Use when Codex runs commands or tools that may create temporary operational data. Do not apply this policy to source code, configuration, examples, or other deliverables Codex creates for the user.
+description: Keep temporary files, directories, sockets, caches, logs, and intermediate artifacts created by Codex while performing a task under `$TMP/codex`. Use when `$TMP` is set and Codex runs commands or tools that may create temporary operational data. Do not use this skill when `$TMP` is unset. Do not apply this policy to source code, configuration, examples, or other deliverables Codex creates for the user.
 ---
 
 # Use `$TMP/codex`
@@ -9,7 +9,8 @@ Place Codex's own temporary files, directories, sockets, caches, logs, and other
 
 ## Apply the rule
 
-1. Assume `$TMP` is already configured and created. Do not create, inspect, or validate it.
+1. Use this skill only when `$TMP` is set. If `$TMP` is unset, do not use this skill.
+2. Assume a set `$TMP` is already configured and created. Do not create, inspect, or validate it.
 
 ## Handle constraints
 

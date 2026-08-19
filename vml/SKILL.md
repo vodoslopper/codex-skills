@@ -26,6 +26,7 @@ VML uses `vml [global-options] <subcommand> [subcommand-options] [name]`. Put gl
 - Single VM: `vml <start|stop|show|remove|ssh|monitor> [options] -n <name>`; `--names <name>` is equivalent.
 - Multiple VMs: use the subcommand's `-n/--names <name>...`, `--parents <parent>...`, or `--tags <tag>...` selector; use global `--all-vms` only when explicitly intended.
 - Create and run: `vml run [options] -n <name>`; create without starting: `vml create [options] -n <name>`. Omit `--image` unless a specific image is required; VML uses the configured default image.
+- For a QCOW2 file that is not managed by VML, pass its full filename directly to `--image`, for example `vml create --image /full/path/to/image.qcow2 -n <name>`; it does not need to be registered first.
 - Guest command: `vml ssh [--check] --cmd '<command>' -n <name>`. Without `--cmd`, SSH is interactive.
 - Copy to a guest: `vml rsync-to --sources <source>... [--destination <destination>] -n <name>`; use `--template <template>` instead of `--sources` for a templated source.
 - Copy from a guest: `vml rsync-from --sources <source>... [--destination <destination>] -n <name>`.

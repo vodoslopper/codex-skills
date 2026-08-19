@@ -1,6 +1,6 @@
 ---
 name: vml
-description: Run and manage virtual machines with the local `vml` CLI. Use when Codex needs to create or run a VM, inspect VM state, start or stop VMs, execute commands over SSH, transfer files, discover or add cloud images, manage VM images, access the QEMU monitor, or remove and clean up VMs.
+description: Run and manage virtual machines with the local `vml` CLI. Use when Codex needs to create or run a VM, inspect VM state, start or stop VMs, execute commands over SSH, transfer files, discover or add cloud images, manage VM images, use graphical or headless-automated displays, access the QEMU monitor, or remove and clean up VMs.
 ---
 
 # VML
@@ -44,6 +44,49 @@ Options generally precede the positional VM name. Preserve shell quoting around 
 - When a specific image is required, inspect `vml image list`, `vml image available`, and the configured `images.default`; ask the user if the choice materially affects the result and cannot be inferred.
 - VM startup can take time. Although `vml start` waits for SSH by default, pass `--wait-ssh` explicitly so configuration cannot override it. Let the command finish and, after a successful return, proceed without a separate readiness or state check.
 - Use `--wait-ssh` for commands where it is not already the default and subsequent work requires the guest to be reachable. Use `--ssh` only when an interactive session is desired.
+
+## GTK Displays
+
+Treat the QEMU display backend as independent of the image catalog properties. Any bootable image can be created, run, or started with `--display-gtk`; an image does not need the `gui` property. The flag provides a GTK framebuffer window but does not install a guest desktop, display manager, or login user. Desktop images can show a full session, ordinary cloud images commonly show a graphical console, and serial-only guests may leave the framebuffer blank.
+
+- Persist GTK in a new VM with `vml create --image <image> --display-gtk -n <name>`, then use `vml start --wait-ssh -n <name>`.
+- Select GTK for one launch with `vml start --display-gtk --wait-ssh -n <name>`.
+- Use `vml run --image <image> --display-gtk --wait-ssh -n <name>` to create and start in one command.
+- Do not add `--properties gui` merely to obtain a GTK window. Use that image-specific property only when its separate guest configuration behavior is intended.
+- For a visible window, run VML from a graphical host session with a usable `DISPLAY`. Confirm QEMU lists `gtk` in `qemu-system-x86_64 -display help`; install the distribution's QEMU GTK UI package if it does not.
+- Keep the display server alive for the entire QEMU process lifetime. Losing the X server terminates a VM using the GTK backend.
+
+## Headless GTK Automation
+
+For automation that does not inspect or manipulate a GUI, prefer `vml start --display-none --wait-ssh -n <name>` and operate through `vml ssh` or the QEMU monitor; it needs no X server. Use Xvfb with GTK only when automation must inspect or manipulate the guest framebuffer. Require Xvfb plus `xdotool`; use ImageMagick's `import` or another capture tool when screenshots are needed. Choose a distinct unused X display for concurrent jobs.
+
+```sh
+vm_name=new
+Xvfb :99 -screen 0 1600x1000x24 -nolisten tcp &
+xvfb_pid=$!
+export DISPLAY=:99
+
+cleanup() {
+    vml stop -n "$vm_name" || :
+    kill "$xvfb_pid" 2>/dev/null || :
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+vml start --display-gtk --wait-ssh -n "$vm_name"
+
+window_id=$(xdotool search --onlyvisible --name '^QEMU$' | tail -n 1)
+xdotool getwindowgeometry "$window_id"
+xdotool mousemove --window "$window_id" 640 400
+xdotool click --window "$window_id" 1
+xdotool key --window "$window_id" Escape
+```
+
+Target the visible uppercase `QEMU` window and confirm its geometry; QEMU may also create a lowercase `qemu` helper window as small as 10 by 10 pixels. On bare Xvfb without a window manager, activation or focus requests can fail even though direct `xdotool --window` input works. Capture before-and-after screenshots and verify an observable screen or guest-state change rather than treating successful input commands as proof of interaction.
+
+Do not wrap a daemonized GTK VM in a short-lived `xvfb-run` command: when the wrapper returns and removes Xvfb, QEMU loses its display and exits. Keep the controlling session alive until automation completes, stop the VM first, and terminate Xvfb afterward. Put temporary logs and screenshots under `$TMP/codex` when the `tmp` skill applies; otherwise use a secure task-specific temporary directory.
 
 ## Manage VMs
 

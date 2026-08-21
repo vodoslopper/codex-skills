@@ -41,7 +41,7 @@ Options generally precede the positional VM name. Preserve shell quoting around 
 - Use `vml run --name-same-image <name>` when the VM and image intentionally have the same name.
 - Add only requested or necessary options such as `--image`, `--memory`, `--nproc`, networking, display, cloud-init, or SSH behavior.
 - Prefer `--exists-ignore` and `--running-ignore` when an idempotent operation is appropriate.
-- Use `--snapshot` when the user wants changes discarded after the run.
+- Do not add `--snapshot` by default. Add it only when the user requests temporary changes or otherwise wants changes discarded after the run.
 - When a specific image is required, inspect `vml image list`, `vml image available`, and the configured `images.default`; ask the user if the choice materially affects the result and cannot be inferred.
 - VM startup can take time. Although `vml start` waits for SSH by default, pass `--wait-ssh` explicitly so configuration cannot override it. Let the command finish and, after a successful return, proceed without a separate readiness or state check.
 - Use `--wait-ssh` for commands where it is not already the default and subsequent work requires the guest to be reachable. Use `--ssh` only when an interactive session is desired.

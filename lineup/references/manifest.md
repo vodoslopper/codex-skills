@@ -161,6 +161,41 @@ test.commands = [
 
 With its default checking, `test.commands` fails at the first unsuccessful command. Prefer separate taskline entries when each operation changes state, has distinct retry or condition behavior, should be resumable independently, or benefits from its own error context. Do not split commands that depend on an earlier `cd`, shell variable, trap, or other process-local state unless that state is expressed again in each entry.
 
+## Capture and persist results
+
+Every command task returns a typed `result` for the next taskline entry. Output is a stripped array of stdout lines by default. Change the shape with command `result` fields:
+
+- `lines = false` returns one string instead of an array;
+- `stream = "stderr"` captures stderr instead of stdout;
+- `strip = false` preserves trailing whitespace;
+- `return-code = true` returns the exit code and takes precedence over output;
+- `matched = true` returns whether `success-matches` or `failure-matches` matched.
+
+For example, inspect an allowed nonzero return code without reparsing shell output:
+
+```toml
+[[tasklines.check]]
+exec.args = ["cmp", "expected", "actual"]
+exec.check = false
+exec.result.return-code = true
+
+[[tasklines.check]]
+info.msg = "cmp returned {{ result }}"
+```
+
+Set `result-fs-var = "NAME"` on any task to write its result as JSON. Read it later with `fs(name='NAME')` or `'NAME' | fs`. This is useful when nested tasklines, filesystem-backed state, or resume behavior make the immediately preceding `result` insufficient:
+
+```toml
+[[tasklines.discover]]
+exec.args = ["printf", "api\\nworker\\n"]
+result-fs-var = "service_names"
+
+[[tasklines.discover]]
+info.msg = "services={{ fs(name='service_names') | json }}"
+```
+
+Filesystem-variable names may contain only alphanumeric characters and underscores. With `--resume`, filesystem variables live under the manifest's `.lineup` state; apply the stale-state precautions in [execution-control.md](execution-control.md#resume-safely).
+
 ## Path and composition rules
 
 - Resolve manifest-relative modules and file transfers deliberately; use `manifest_dir` for explicit host paths.

@@ -240,6 +240,20 @@ Workers support the same scalar expansion plus lookup tables:
 
 Use these tables for per-worker image, address, user, or resource differences instead of copying complete worker definitions. Keep lookup keys unique; unmatched lookups do not fail automatically, so validate required row fields through rendering or explicit checks.
 
+## Control context, flow, and retries
+
+Task-local `vars` normally extend the inherited context. Use `clean-vars = true` for an isolated task that must not see preceding or global variables; only item/row data and the task's own variables are then added. Do not enable it on a task whose templates depend on inherited values.
+
+Use `export-vars = ["NAME", ...]` to propagate selected task-local variables to subsequent entries in the same running taskline. It does not export those variables back to the caller of a nested `run` or `run-taskline`; use the nested taskline's returned `result` for that boundary. With `table` expansion, each exported variable is folded into an array; with `items`, it is folded into an object keyed by item.
+
+`condition` (also accepted as `cond` or `if` in Lineup 0.1.1) renders before execution. The literal strings `true` and `false` run or skip directly; any other rendered value is executed as a shell command on the worker, and command failure skips the task while preserving the preceding result. Use it for a worker-side precondition, not for hiding an unexpected failure in the task itself.
+
+Use `break = {}` for an intentional successful exit from the innermost taskline. It returns the preceding result by default; `break.result` can replace it, and `break.taskline` can name an enclosing taskline. Prefer `break` over a failing shell command when reaching a condition means the requested outcome is already satisfied.
+
+Retry behavior is version-sensitive. In the verified Lineup 0.1.1 implementation, the task runs once before the retry loop, and `try.attempts` controls additional executions after failure. Thus `try.attempts = 2` can execute the task three times total. Verify this against the installed version rather than assuming the field is a total-attempt count.
+
+`try.sleep` accepts fractional seconds. `try.cleanup.task` runs after the delay and before each retry; cleanup failure is logged as a warning and does not stop the retry. Keep retries bounded and use cleanup only for idempotent recovery of partial state.
+
 ## Path and composition rules
 
 - Resolve manifest-relative modules and file transfers deliberately; use `manifest_dir` for explicit host paths.

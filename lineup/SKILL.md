@@ -40,6 +40,7 @@ When iterating on only part of a workflow, read [references/execution-control.md
 - Set `shell.stdout.print = true` only when output should be user-visible; Lineup otherwise logs command output.
 - Use `condition` for worker-side preconditions and `if` for rendered boolean conditions when supported by the existing manifest/version.
 - Use `ensure.vars` at taskline boundaries to document required inputs and their types.
+- Use `clean-vars`, `export-vars`, and `break` deliberately when designing module boundaries or early-success paths. Check version-specific retry semantics before setting `try.attempts`; see [references/manifest.md](references/manifest.md#control-context-flow-and-retries).
 - Use `items` for genuine repetition. Set `parallel = false` when ordering or shared state makes concurrent items unsafe.
 - Prefer `items`, `table`, `table-by-item`, and `table-by-name` over duplicated tasks or workers when configuration is data-driven. Read [references/manifest.md](references/manifest.md#drive-tasks-and-workers-from-data) before using command-generated data.
 - Limit taskset execution with `workers` regexes. Remember that taskset tasks otherwise run on all workers.

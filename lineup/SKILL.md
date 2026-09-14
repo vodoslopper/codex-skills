@@ -15,8 +15,8 @@ Work with Lineup's TOML manifests while preserving the surrounding project's con
 4. Read [references/manifest.md](references/manifest.md) before creating a manifest, introducing an unfamiliar section/task/engine, or diagnosing schema behavior.
 5. Model execution explicitly:
    - define execution targets under `[workers]`;
-   - put reusable sequential steps in `[[tasklines.NAME]]`;
-   - schedule tasks under `[taskset.NAME]` and order them with `requires`;
+   - define reusable sequential steps in `[[tasklines.NAME]]` before the `[taskset.NAME]` entries that execute them;
+   - put taskset execution wiring after taskline definitions and order it with `requires`;
    - keep shared inputs in `[vars]` and task-local inputs in `vars.*`;
    - import reusable variables or tasklines with `[use]`.
 6. Prefer a module taskline whenever its contract covers the operation. Import it once under `[use]`, call it with `run`, and pass its declared variables. Use direct `run-taskline` when importing the whole module would be unnecessary or would cause name collisions.
@@ -35,7 +35,7 @@ When iterating on only part of a workflow, read [references/execution-control.md
 - Use `shell.cmd` directly for shell expressions, pipelines, redirections, substitutions, compound commands, and tests. Do not wrap these in `exec.args = ["sh", "-c", ...]` or `exec.args = ["sh", "-eu", "-c", ...]`.
 - Use `exec.args` for a remaining one-off command only when every argument can be passed literally without shell parsing.
 - Split long shell scripts into focused taskline entries when the steps can run independently. This improves failure context and resume granularity. Keep commands together when they must share shell state or form one transactional operation.
-- Prefer Lineup command checks over shell assertion plumbing: commands already fail on an unexpected return code; use `success-codes` for accepted nonzero codes and `success-matches` or `failure-matches` to test output with regexes. Use `test.commands` for a small group of independent checks. See [references/manifest.md](references/manifest.md#validate-commands-natively).
+- Prefer Lineup command checks over shell assertion plumbing: commands already fail on an unexpected return code; use `success-codes` for accepted nonzero codes and `success-matches` or `failure-matches` to test output with regexes. Keep output checks as dedicated taskline entries; use `test.commands` only for a compact group of return-code checks. See [references/manifest.md](references/manifest.md#validate-commands-natively).
 - Shape command output with Lineup's `result` controls and pass the typed `result` to the next taskline entry. Use `result-fs-var` when the value must survive beyond the current taskline context. See [references/manifest.md](references/manifest.md#capture-and-persist-results).
 - Set `shell.stdout.print = true` only when output should be user-visible; Lineup otherwise logs command output.
 - Use `condition` for worker-side preconditions and `if` for rendered boolean conditions when supported by the existing manifest/version.

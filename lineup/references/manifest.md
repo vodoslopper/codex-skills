@@ -88,6 +88,8 @@ Taskset entries are tasks. Important scheduling fields:
 
 Tasklines run sequentially; taskset tasks and item expansions may run concurrently. State ordering explicitly.
 
+For readability, define tasklines before the taskset entries that execute them. Keep the bottom of the manifest as a concise execution graph of `run`, `workers`, `requires`, and phase fields rather than interleaving definitions with execution wiring.
+
 ## Common task fields
 
 Tasks accept `condition`, `items`, `items-var`, `parallel`, `vars`, `export-vars`, `clean-vars`, `try`, and `table`. Existing manifests may also use a rendered `if` condition.
@@ -148,16 +150,17 @@ shell.failure-matches = { or = [
 
 Regexes see the raw captured stream, including its trailing newline. Account for it when anchoring a pattern. TOML literal strings are convenient because regex backslashes remain literal; in a double-quoted TOML basic string, write `\\.` to pass `\.` to the regex engine.
 
-Use `test.commands` to express a short collection of independent command assertions. Strings and `cmd` tables are shell commands; argument arrays and `args` tables execute directly:
+Use `test.commands` only for a short collection of independent return-code assertions. Strings are shell commands and argument arrays execute directly:
 
 ```toml
 [[tasklines.verify]]
 test.commands = [
   ["test", "-s", "/etc/example.conf"],
-  { args = ["mytool", "status"], success-matches = { out-re = "ready" } },
-  { cmd = "systemctl is-active example", success-matches = { out-re = '^active(?:\r?\n)?$' } },
+  ["test", "-d", "/var/lib/example"],
 ]
 ```
+
+Do not put commands with `success-matches`, `failure-matches`, output controls, or result controls inside `test.commands`; their inline tables become long and difficult to review. Give each such command its own `[[tasklines.NAME]]` entry. This also provides focused error context and an independent resume-history position.
 
 With its default checking, `test.commands` fails at the first unsuccessful command. Prefer separate taskline entries when each operation changes state, has distinct retry or condition behavior, should be resumable independently, or benefits from its own error context. Do not split commands that depend on an earlier `cd`, shell variable, trap, or other process-local state unless that state is expressed again in each entry.
 

@@ -41,6 +41,7 @@ When iterating on only part of a workflow, read [references/execution-control.md
 - Use `condition` for worker-side preconditions and `if` for rendered boolean conditions when supported by the existing manifest/version.
 - Use `ensure.vars` at taskline boundaries to document required inputs and their types.
 - Use `items` for genuine repetition. Set `parallel = false` when ordering or shared state makes concurrent items unsafe.
+- Prefer `items`, `table`, `table-by-item`, and `table-by-name` over duplicated tasks or workers when configuration is data-driven. Read [references/manifest.md](references/manifest.md#drive-tasks-and-workers-from-data) before using command-generated data.
 - Limit taskset execution with `workers` regexes. Remember that taskset tasks otherwise run on all workers.
 - Use `when = "before"` or `when = "after"` for global setup/teardown phases instead of large dependency lists.
 - Use `try` only for plausibly transient failures, with bounded attempts and cleanup when partial state can remain.

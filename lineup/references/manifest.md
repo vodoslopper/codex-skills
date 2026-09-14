@@ -196,6 +196,50 @@ info.msg = "services={{ fs(name='service_names') | json }}"
 
 Filesystem-variable names may contain only alphanumeric characters and underscores. With `--resume`, filesystem variables live under the manifest's `.lineup` state; apply the stale-state precautions in [execution-control.md](execution-control.md#resume-safely).
 
+## Drive tasks and workers from data
+
+Use `items` when one task should repeat over scalar values. Sources may be a literal array, a half-open numeric sequence, JSON, an array or object variable, or lines printed by a host command. Change the loop variable with `items-var`:
+
+```toml
+[[tasklines.check]]
+exec.args = ["systemctl", "is-active", "{{ service }}"]
+items-var = "service"
+items.var = "services"
+parallel = false
+```
+
+Items run in parallel by default. Set `parallel = false` for deterministic order, shared state, rate limits, or operations that must not overlap. An item-expanded task returns an object keyed by the rendered item value.
+
+Use `table` when each repetition needs several named fields. Each row is available as `row`, and the task returns an array of row results:
+
+```toml
+[[tasklines.deploy]]
+exec.args = ["install-service", "{{ row.name }}", "{{ row.port }}"]
+table = [
+  { name = "api", port = 8080 },
+  { name = "metrics", port = 9090 },
+]
+parallel = false
+```
+
+A table may instead be produced by a command and decoded as `json`, `yaml`, `toml`, or `csv`:
+
+```toml
+[[tasklines.deploy]]
+exec.args = ["install-service", "{{ row.name }}", "{{ row.port }}"]
+table = { command = "inventory export --format json", format = "json" }
+```
+
+Both `items.command` and `table.command` execute on the Lineup host, not on the selected worker. Do not use them for worker-only discovery or interpolate untrusted data into their shell command. Prefer `items.var` or `items.json` when the data is already available in the manifest context.
+
+Workers support the same scalar expansion plus lookup tables:
+
+- `table-by-item` selects the row whose `item` field matches the current expansion and exposes it as `row_by_item`;
+- `table-by-name` selects the row whose rendered `name` matches the final worker name and exposes it as `row_by_name`;
+- `[default.worker]` can provide shared `items`, lookup tables, or an engine to workers that omit them.
+
+Use these tables for per-worker image, address, user, or resource differences instead of copying complete worker definitions. Keep lookup keys unique; unmatched lookups do not fail automatically, so validate required row fields through rendering or explicit checks.
+
 ## Path and composition rules
 
 - Resolve manifest-relative modules and file transfers deliberately; use `manifest_dir` for explicit host paths.

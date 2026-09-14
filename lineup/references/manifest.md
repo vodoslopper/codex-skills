@@ -148,7 +148,15 @@ shell.failure-matches = { or = [
 ] }
 ```
 
-Regexes see the raw captured stream, including its trailing newline. Account for it when anchoring a pattern. TOML literal strings are convenient because regex backslashes remain literal; in a double-quoted TOML basic string, write `\\.` to pass `\.` to the regex engine.
+Regexes see the raw captured stream, including its trailing newline. Account for it when anchoring a pattern. Prefer concise Rust-regex shorthands such as `\s`, `\d`, and `\w` to `[[:space:]]`, `[[:digit:]]`, and `[[:word:]]` when either spelling has the intended semantics. Keep an explicit class when its ASCII/POSIX behavior is required.
+
+TOML literal strings are convenient because regex backslashes remain literal:
+
+```toml
+exec.success-matches.out-re = '^name\s+version\s+\d+\.\d+(?:\r?\n)?$'
+```
+
+In a double-quoted TOML basic string, escape each regex backslash: write `\\s` to pass `\s`, or `\\.` to pass `\.` to the regex engine.
 
 Use `test.commands` only for a short collection of independent return-code assertions. Strings are shell commands and argument arrays execute directly:
 

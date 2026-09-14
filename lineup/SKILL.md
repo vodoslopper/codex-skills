@@ -36,6 +36,7 @@ When iterating on only part of a workflow, read [references/execution-control.md
 - Use `exec.args` for a remaining one-off command only when every argument can be passed literally without shell parsing.
 - Split long shell scripts into focused taskline entries when the steps can run independently. This improves failure context and resume granularity. Keep commands together when they must share shell state or form one transactional operation.
 - Prefer Lineup command checks over shell assertion plumbing: commands already fail on an unexpected return code; use `success-codes` for accepted nonzero codes and `success-matches` or `failure-matches` to test output with regexes. Keep output checks as dedicated taskline entries; use `test.commands` only for a compact group of return-code checks. See [references/manifest.md](references/manifest.md#validate-commands-natively).
+- Prefer concise Rust-regex shorthands such as `\s`, `\d`, and `\w` over POSIX classes such as `[[:space:]]`, `[[:digit:]]`, and `[[:word:]]` when their semantics fit.
 - Shape command output with Lineup's `result` controls and pass the typed `result` to the next taskline entry. Use `result-fs-var` when the value must survive beyond the current taskline context. See [references/manifest.md](references/manifest.md#capture-and-persist-results).
 - Set `shell.stdout.print = true` only when output should be user-visible; Lineup otherwise logs command output.
 - Use `condition` for worker-side preconditions and `if` for rendered boolean conditions when supported by the existing manifest/version.

@@ -121,6 +121,46 @@ Shell/exec command controls include `check`, `stdin`, `stdout`, `stderr`, `succe
 
 Match formulas combine `and`/`or` with `err-re`, `out-re`, or `any-re` regex leaves.
 
+## Validate commands natively
+
+Do not build a large shell script merely to inspect exit status or pipe captured output into `grep`. A `shell` or `exec` task checks for return code 0 by default. Declare other accepted codes with `success-codes`:
+
+```toml
+[[tasklines.verify]]
+exec.args = ["diff", "expected.txt", "actual.txt"]
+exec.success-codes = [0, 1]
+```
+
+Use `success-matches` when output must contain a regex and `failure-matches` when matching output should fail the task. Select `out-re`, `err-re`, or `any-re`; combine leaves with `and` or `or` when necessary:
+
+```toml
+[[tasklines.verify]]
+exec.args = ["mytool", "--version"]
+exec.success-matches.out-re = '^mytool 2\.4\.1(?:\r?\n)?$'
+
+[[tasklines.verify]]
+shell.cmd = "mytool check --verbose"
+shell.failure-matches = { or = [
+  { out-re = "FAILED" },
+  { err-re = "fatal:" },
+] }
+```
+
+Regexes see the raw captured stream, including its trailing newline. Account for it when anchoring a pattern. TOML literal strings are convenient because regex backslashes remain literal; in a double-quoted TOML basic string, write `\\.` to pass `\.` to the regex engine.
+
+Use `test.commands` to express a short collection of independent command assertions. Strings and `cmd` tables are shell commands; argument arrays and `args` tables execute directly:
+
+```toml
+[[tasklines.verify]]
+test.commands = [
+  ["test", "-s", "/etc/example.conf"],
+  { args = ["mytool", "status"], success-matches = { out-re = "ready" } },
+  { cmd = "systemctl is-active example", success-matches = { out-re = '^active(?:\r?\n)?$' } },
+]
+```
+
+With its default checking, `test.commands` fails at the first unsuccessful command. Prefer separate taskline entries when each operation changes state, has distinct retry or condition behavior, should be resumable independently, or benefits from its own error context. Do not split commands that depend on an earlier `cd`, shell variable, trap, or other process-local state unless that state is expressed again in each entry.
+
 ## Path and composition rules
 
 - Resolve manifest-relative modules and file transfers deliberately; use `manifest_dir` for explicit host paths.

@@ -34,6 +34,8 @@ When iterating on only part of a workflow, read [references/execution-control.md
 - Define `host` as the string exception, `[workers.NAME] engine = "host"`. Define every other worker engine as a nested table such as `[workers.NAME.engine.vml]`, `[workers.NAME.engine.podman]`, or `[workers.NAME.engine.ssh]`.
 - Use `shell.cmd` directly for shell expressions, pipelines, redirections, substitutions, compound commands, and tests. Do not wrap these in `exec.args = ["sh", "-c", ...]` or `exec.args = ["sh", "-eu", "-c", ...]`.
 - Use `exec.args` for a remaining one-off command only when every argument can be passed literally without shell parsing.
+- Split long shell scripts into focused taskline entries when the steps can run independently. This improves failure context and resume granularity. Keep commands together when they must share shell state or form one transactional operation.
+- Prefer Lineup command checks over shell assertion plumbing: commands already fail on an unexpected return code; use `success-codes` for accepted nonzero codes and `success-matches` or `failure-matches` to test output with regexes. Use `test.commands` for a small group of independent checks. See [references/manifest.md](references/manifest.md#validate-commands-natively).
 - Set `shell.stdout.print = true` only when output should be user-visible; Lineup otherwise logs command output.
 - Use `condition` for worker-side preconditions and `if` for rendered boolean conditions when supported by the existing manifest/version.
 - Use `ensure.vars` at taskline boundaries to document required inputs and their types.

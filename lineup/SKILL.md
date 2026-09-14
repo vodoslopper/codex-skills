@@ -26,6 +26,8 @@ Work with Lineup's TOML manifests while preserving the surrounding project's con
 10. Validate safely. Parse TOML locally when a TOML parser is available, then run Lineup only when execution is authorized and its workers/resources are safe to create. Prefer a debug engine or an isolated test manifest when execution would mutate systems.
 11. Report validation performed, runtime assumptions, and anything that was not executed.
 
+When iterating on only part of a workflow, read [references/execution-control.md](references/execution-control.md) before choosing task filters, preserving workers, or reusing resume history. Resume history is structural and can become stale after manifest edits.
+
 ## Apply design rules
 
 - Search modules first. Prefer `apt-get.install`, `systemctl.enable`, `useradd`, `sed`, `wait`, or another existing module taskline over spelling out the equivalent command.
@@ -90,10 +92,8 @@ Lineup's shell task already runs a shell command and checks failure by default. 
 - Initialize a basic manifest with `lineup init`; it writes `LM.toml` by default.
 - Select another manifest with `lineup --manifest PATH`.
 - Override values with repeated `--extra-vars NAME=VALUE` arguments.
-- Preserve workers after a successful run with `--no-cleanup`; request cleanup with `--cleanup` or `lineup cleanup`.
-- Use `--cleanup-before` only when removing existing Lineup-managed state is intended.
-- Use `--resume` to persist filesystem variables and completed-task history under `.lineup` and skip completed tasks on the next run.
-- Consult `lineup --help` for task filtering and history options because these are operational controls, not manifest schema.
+- Use task filters, cleanup controls, and resume only after reading [references/execution-control.md](references/execution-control.md). These are CLI execution controls, not manifest schema.
+- Consult the installed `lineup --help` before applying the reference to another version.
 
 ## Review changes
 

@@ -1,6 +1,6 @@
 ---
 name: vml
-description: Run and manage virtual machines with the local `vml` CLI. Use when Codex needs to create or run a VM, inspect VM state, start or stop VMs, execute commands over SSH, transfer files, discover or add cloud images, manage VM images, use graphical or headless-automated displays, access the QEMU monitor, or remove and clean up VMs.
+description: Run and manage virtual machines with the local `vml` CLI. Use when an agent needs to create or run a VM, inspect VM state, start or stop VMs, execute commands over SSH, transfer files, discover or add cloud images, manage VM images, use graphical or headless-automated displays, access the QEMU monitor, or remove and clean up VMs.
 ---
 
 # VML
@@ -87,7 +87,7 @@ xdotool key --window "$window_id" Escape
 
 Target the visible uppercase `QEMU` window and confirm its geometry; QEMU may also create a lowercase `qemu` helper window as small as 10 by 10 pixels. On bare Xvfb without a window manager, activation or focus requests can fail even though direct `xdotool --window` input works. Capture before-and-after screenshots and verify an observable screen or guest-state change rather than treating successful input commands as proof of interaction.
 
-Do not wrap a daemonized GTK VM in a short-lived `xvfb-run` command: when the wrapper returns and removes Xvfb, QEMU loses its display and exits. Keep the controlling session alive until automation completes, stop the VM first, and terminate Xvfb afterward. Put temporary logs and screenshots under `$TMP/codex` when the `tmp` skill applies; otherwise use a secure task-specific temporary directory.
+Do not wrap a daemonized GTK VM in a short-lived `xvfb-run` command: when the wrapper returns and removes Xvfb, QEMU loses its display and exits. Keep the controlling session alive until automation completes, stop the VM first, and terminate Xvfb afterward. Put temporary logs and screenshots in the agent-specific directory prescribed by the `tmp` skill when it applies; otherwise use a secure task-specific temporary directory.
 
 ## Manage VMs
 

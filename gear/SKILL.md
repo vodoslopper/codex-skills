@@ -1,6 +1,6 @@
 ---
 name: gear
-description: Build, rebuild, and troubleshoot ALT Linux RPM packages from Gear Git repositories using Gear and Hasher. Use when Codex needs to inspect a spec and `.gear/rules`, run the project's `gear --commit --hasher -- hsh-rebuild --no-sisyphus-check=packager,gpg` workflow, capture and analyze its build log, locate RPM artifacts, or fix Gear export, BuildRequires, RPM, compilation, file-list, or Sisyphus-check failures.
+description: Build, rebuild, and troubleshoot ALT Linux RPM packages from Gear Git repositories using Gear and Hasher. Use when an agent needs to inspect a spec and `.gear/rules`, run the project's `gear --commit --hasher -- hsh-rebuild --no-sisyphus-check=packager,gpg` workflow, capture and analyze its build log, locate RPM artifacts, or fix Gear export, BuildRequires, RPM, compilation, file-list, or Sisyphus-check failures.
 ---
 
 # Build ALT Linux Packages with Gear and Hasher
